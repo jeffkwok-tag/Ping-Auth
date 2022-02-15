@@ -26,7 +26,13 @@ import {
 } from "@openid/appauth";
 
 import { BehaviorSubject, Observable, combineLatest } from "rxjs";
-import { distinctUntilChanged, filter, take } from "rxjs/operators";
+import {
+  distinctUntilChanged,
+  filter,
+  switchMap,
+  take,
+  withLatestFrom,
+} from "rxjs/operators";
 import { TokenResponseJson } from "@openid/appauth";
 import { UserInfo } from "./userinfo";
 import { AuthorizationConfig } from "./authorization_config";
@@ -134,6 +140,7 @@ export class AuthorizationService {
         AuthorizationServiceConfiguration | null,
         TokenResponse | null
       ]) => {
+        console.log("THIS IS MY TOKEN:", token);
         // if the service config is cleared, we need to invalidate any TokenResponse/userInfo
         if (configuration == null) {
           if (token != null) {
@@ -225,7 +232,30 @@ export class AuthorizationService {
   }
 
   signOut(): void {
-    console.log("signing out");
+    window.localStorage.removeItem(LS_ISSUER_URI);
+    window.localStorage.removeItem(LS_USER_INFO);
+    window.localStorage.removeItem(LS_OPENID_CONFIG);
+    window.localStorage.removeItem(LS_TOKEN_RESPONSE);
+
+    this._serviceConfigs
+      .pipe(
+        filter((value: any) => value != null),
+        take(1),
+        withLatestFrom(this._tokenResponses)
+      )
+      .subscribe(
+        ([configuration, token]: [
+          AuthorizationServiceConfiguration,
+          TokenResponse | null
+        ]) => {
+          //TODO WILL NEED TO CHANGE TO ANGULAR WAY OF HANDLING WINDOW
+          window.location.href = `${
+            configuration.endSessionEndpoint
+          }?post_logout_redirect_uri=https://localhost:4200&id_token_hint=${
+            token!.idToken
+          }`;
+        }
+      );
     this._tokenResponses.next(null);
   }
 
@@ -244,7 +274,7 @@ export class AuthorizationService {
               error
             );
             if (response && response.code) {
-                console.log(response)
+              console.log(response);
               const tokenHandler = new BaseTokenRequestHandler(this.requestor);
 
               // use the code to make the token request.
