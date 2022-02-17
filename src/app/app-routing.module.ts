@@ -21,16 +21,17 @@ import { AuthResolver } from './auth.resolver';
       {
         path: '',
         redirectTo: '/dashboard',
-        pathMatch: 'full'
+        pathMatch: 'full',
+
       },
       {path: 'metadata', component: MetadataComponent},
       {path: 'callback', component: CallbackComponent},
       {
         path: 'dashboard',
         component: DashboardComponent,
-        resolve: {
-          main: AuthResolver
-        }
+        // resolve: {
+        //   main: AuthResolver
+        // }
       }
     ], {relativeLinkResolution: 'legacy'})
   ],

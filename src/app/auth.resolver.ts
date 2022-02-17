@@ -10,6 +10,7 @@ export class AuthResolver implements Resolve<any> {
   loading = false;
 
   constructor(private authFacade: AuthFacade) {
+    console.log("INSIDE AUTH RESOLVER")
   }
 
   resolve(

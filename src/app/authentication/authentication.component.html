@@ -1,8 +1,7 @@
-<mat-card *ngIf='!authorized'>
+<mat-card *ngIf='(isAuthenticated$ | async) === false'>
   <mat-card-header>
     <mat-card-title>User information</mat-card-title>
     <mat-icon mat-card-avatar style='font-size: 40px'>info</mat-icon>
-    <!-- <i mat-card-avatar style='font-size: 40px' class="material-icons">info</i> -->
   </mat-card-header>
   <mat-card-content>
     <p>
@@ -10,41 +9,15 @@
     </p>
   </mat-card-content>
   <button *ngIf="(isAuthenticated$ | async) === false" id="handle-sign-in" mat-button
-          (click)='authFacade.login()'>SIGN
+          (click)='login()'>SIGN
     IN
   </button>
-  <!--  <button *ngIf="(isAuthenticated$ | async) === false" id="handle-sign-in" mat-button-->
-  <!--          (click)='authorizationService.authorize()'>SIGN-->
-  <!--    IN-->
-  <!--  </button>-->
 </mat-card>
 <mat-card *ngIf='isAuthenticated$ | async'>
-  <!--  <mat-card-header>-->
-  <!--    <mat-card-title>User information</mat-card-title>-->
-  <!--    <img mat-card-avatar *ngIf="userInfo?.picture" src='{{userInfo?.picture}}' referrerpolicy="no-referrer"/>-->
-  <!--  </mat-card-header>-->
-  <mat-card-content *ngIf='(userInfo$ | async) !== null'>
-    <h4>Authorized</h4>
-    <p>The user has been authorized by the Identity Provider, but has no user information to display</p>
-  </mat-card-content>
   <mat-card-content *ngIf='(userInfo$ | async)'>
     <h4>Authorized</h4>
     <p>The user has been authorized by the Identity Provider, with the following additional user information.</p>
-    <pre class='json-display'>{{ userInfo$ | json }}</pre>
+    <pre class='json-display'>{{ userInfo$ | async | json }}</pre>
   </mat-card-content>
   <button id="handle-sign-out" mat-button (click)='authFacade.logout()'>SIGN OUT</button>
 </mat-card>
-
-
-<!--<mat-card *ngIf='userInfo'>-->
-<!--  <mat-card-content *ngIf='userInfo'>-->
-<!--    <h4>Authorized</h4>-->
-<!--    <p>The user has been authorized by the Identity Provider, but has no user information to display</p>-->
-<!--  </mat-card-content>-->
-<!--  <mat-card-content *ngIf='userInfo'>-->
-<!--    <h4>Authorized</h4>-->
-<!--    <p>The user has been authorized by the Identity Provider, with the following additional user information.</p>-->
-<!--    <pre class='json-display'>{{ userInfo | json }}</pre>-->
-<!--  </mat-card-content>-->
-<!--  <button id="handle-sign-out" mat-button (click)='authorizationService.signOut()'>SIGN OUT</button>-->
-<!--</mat-card>-->

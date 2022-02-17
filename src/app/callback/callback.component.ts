@@ -10,14 +10,13 @@
 // limitations under the License.
 
 import { Component, OnInit, AfterViewInit } from "@angular/core";
-import { RedirectRequestHandler } from "@openid/appauth";
-import { AuthorizationService } from "../authorization.service";
-import { AppRoutingModule } from "../app-routing.module";
 import { Router } from "@angular/router";
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { AuthFacade } from '../+state/auth.facade';
-import { take } from 'rxjs/operators';
+import { AuthUser } from '../models/auth.user';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: "app-callback",
   templateUrl: "./callback.component.html",
@@ -25,13 +24,14 @@ import { take } from 'rxjs/operators';
 })
 export class CallbackComponent implements AfterViewInit {
   isAuthenticated$: Observable<boolean>;
+  userInfo$: Observable<AuthUser | null>;
 
   constructor(
-    public authorizationService: AuthorizationService,
     public authFacade: AuthFacade,
     public router: Router
   ) {
     this.isAuthenticated$ = this.authFacade.isAuthenticated$;
+    this.userInfo$ = this.authFacade.user$;
   }
 
   ngAfterViewInit() {
@@ -39,22 +39,22 @@ export class CallbackComponent implements AfterViewInit {
       const queryString = window.location.search.substring(1); // substring strips '?'
       const path = [window.location.pathname, queryString].join("#");
       window.location.assign(new URL(path, window.location.href).toString());
-      console.log("in here");
     } else if (
       new URLSearchParams(window.location.hash.substring(1)).has("code")
     ) {
-      this.isAuthenticated$.pipe((take(1))).subscribe((isAuthenticated) => {
-        console.log("I'M AUTHENTICATED INSIDE CALLBACK COMPONENT")
-        this.router.navigate(["dashboard"])
+      combineLatest([
+        this.isAuthenticated$,
+        this.userInfo$
+      ]).pipe(
+        untilDestroyed(this),
+      ).subscribe(([isAuthenticated, user]: [boolean, AuthUser | null]) => {
+        if (isAuthenticated && user) {
+          this.router.navigate(["dashboard"])
+        } else {
+          this.authFacade.init();
+        }
       })
-      // this.authorizationService
-      //   .completeAuthorizationRequest()
-      //   .then((tokenResponse) => {
-      //     console.log("recieved token response: " + tokenResponse);
-      //     this.router.navigate(["dashboard"]);
-      //   });
     } else {
-      console.log("did not recognize callback in URL fragment or query");
       this.router.navigate(["dashboard"]);
     }
   }

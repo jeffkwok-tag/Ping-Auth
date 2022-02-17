@@ -36,7 +36,6 @@ import {
 import { TokenResponseJson } from "@openid/appauth";
 import { UserInfo } from "./userinfo";
 import { AuthorizationConfig } from "./authorization_config";
-import { OAuthService } from 'angular-oauth2-oidc';
 
 const LS_ISSUER_URI = "authorization.service.issuer_uri";
 const LS_USER_INFO = "authorization.service.user_info";
@@ -62,7 +61,6 @@ export class AuthorizationService {
 
   constructor(
     private requestor: Requestor,
-    private oauthService: OAuthService,
     @Inject("AuthorizationConfig") private environment: AuthorizationConfig
   ) {
     this.authorizationHandler.setAuthorizationNotifier(this.notifier);

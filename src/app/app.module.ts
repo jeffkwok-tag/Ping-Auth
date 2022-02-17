@@ -30,7 +30,7 @@ import { Requestor, FetchRequestor } from "@openid/appauth";
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { AuthenticationComponent } from "./authentication/authentication.component";
-import { AuthorizationService } from "./authorization.service";
+// import { AuthorizationService } from "./authorization.service";
 import { CallbackComponent } from "./callback/callback.component";
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import { IntroComponent } from "./intro/intro.component";
@@ -112,7 +112,7 @@ import { AuthResolver } from './auth.resolver';
     EffectsModule.forRoot([AuthEffects]),
   ],
   providers: [
-    AuthorizationService,
+    // AuthorizationService,
     AuthService,
     IntroDisplayService,
     AuthEffects,

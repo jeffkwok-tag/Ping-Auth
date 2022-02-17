@@ -13,15 +13,14 @@ export class AuthFacade {
   loggingInComplete$ = this.store.select(authQuery.selectLoggingIncomplete);
   isAuthenticated$ = this.store.select(authQuery.selectIsAuthenticated);
 
-  constructor(private store: Store<State>) {}
+  constructor(private store: Store<State>) {
+  }
 
   init() {
-    console.log("i was called");
     this.store.dispatch(authActions.init());
   }
 
   login() {
-    console.log("login was called");
     this.store.dispatch(authActions.login());
   }
 
