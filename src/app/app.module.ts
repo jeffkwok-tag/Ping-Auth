@@ -39,6 +39,17 @@ import { MetadataComponent } from "./metadata/metadata.component";
 import { environment } from "../environments/environment";
 import { AuthorizationConfig } from "./authorization_config";
 import { IntroDisplayService } from "./intro-display.service";
+import { OAuthModule } from "angular-oauth2-oidc";
+import { StoreModule } from "@ngrx/store";
+
+import { authReducer } from "./+state/auth.reducer";
+import { AuthEffects } from "./+state/auth.effects";
+import { EffectsModule } from "@ngrx/effects";
+import { AuthService } from "./auth.service";
+import { AuthFacade } from "./+state/auth.facade";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { AuthResolver } from './auth.resolver';
 
 @NgModule({
   declarations: [
@@ -62,13 +73,55 @@ import { IntroDisplayService } from "./intro-display.service";
     MatSnackBarModule,
     MatToolbarModule,
     AppRoutingModule,
+    HttpClientModule,
+
+    OAuthModule.forRoot({
+      resourceServer: {
+        allowedUrls: [
+          // "https://demo-api.mfm.ag/api/1",
+          // "https://qa-api.mfm.ag/api/1",
+          // "https://qadata-api.mfm.ag/api/1",
+          // "https://decisive-mobile-api.azurewebsites.net/api/1",
+          // "https://decisive-prod-api-pre-prod.azurewebsites.net/api/1",
+          // "https://api.mfm.ag/api/1",
+          // "https://release-api.mfm.ag/api/1",
+          // "http://localhost:6002/api/1",
+          // "http://api.mfm-local.ag:6002/api/1",
+          "https://auth.pingone.ca/662705cd-75fd-4eb2-992a-d5ad63567e3e/as",
+        ],
+        sendAccessToken: true,
+      },
+    }),
+
+    StoreModule.forRoot(
+      {auth: authReducer},
+      {
+        runtimeChecks: {
+          strictStateImmutability: true,
+          strictActionImmutability: true,
+          strictStateSerializability: true,
+          strictActionSerializability: true,
+        },
+      }
+    ),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25, // DONT COMMIT ME
+      name: 'Testing',
+      logOnly: environment.production,
+    }),
+    EffectsModule.forRoot([AuthEffects]),
   ],
   providers: [
     AuthorizationService,
+    AuthService,
     IntroDisplayService,
-    { provide: Requestor, useValue: new FetchRequestor() },
-    { provide: "AuthorizationConfig", useValue: environment },
+    AuthEffects,
+    AuthFacade,
+    AuthResolver,
+    {provide: Requestor, useValue: new FetchRequestor()},
+    {provide: "AuthorizationConfig", useValue: environment},
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+}

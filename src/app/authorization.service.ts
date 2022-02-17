@@ -36,11 +36,13 @@ import {
 import { TokenResponseJson } from "@openid/appauth";
 import { UserInfo } from "./userinfo";
 import { AuthorizationConfig } from "./authorization_config";
+import { OAuthService } from 'angular-oauth2-oidc';
 
 const LS_ISSUER_URI = "authorization.service.issuer_uri";
 const LS_USER_INFO = "authorization.service.user_info";
 const LS_OPENID_CONFIG = "authorization.service.parsed_openid_configuration";
 const LS_TOKEN_RESPONSE = "authorization.service.token_response";
+
 @Injectable()
 export class AuthorizationService {
   private notifier = new AuthorizationNotifier();
@@ -60,6 +62,7 @@ export class AuthorizationService {
 
   constructor(
     private requestor: Requestor,
+    private oauthService: OAuthService,
     @Inject("AuthorizationConfig") private environment: AuthorizationConfig
   ) {
     this.authorizationHandler.setAuthorizationNotifier(this.notifier);
@@ -137,8 +140,8 @@ export class AuthorizationService {
     // and to fetch userInfo.
     combineLatest([this._serviceConfigs, this._tokenResponses]).subscribe(
       ([configuration, token]: [
-        AuthorizationServiceConfiguration | null,
-        TokenResponse | null
+          AuthorizationServiceConfiguration | null,
+          TokenResponse | null
       ]) => {
         console.log("THIS IS MY TOKEN:", token);
         // if the service config is cleared, we need to invalidate any TokenResponse/userInfo
@@ -174,7 +177,7 @@ export class AuthorizationService {
               url: configuration.userInfoEndpoint,
               method: "GET",
               dataType: "json",
-              headers: { Authorization: `Bearer ${accessToken}` },
+              headers: {Authorization: `Bearer ${accessToken}`},
             })
             .then((userinfo) => {
               console.log(userInfo);
@@ -246,7 +249,7 @@ export class AuthorizationService {
       .subscribe(
         ([configuration, token]: [
           AuthorizationServiceConfiguration,
-          TokenResponse | null
+            TokenResponse | null
         ]) => {
           //TODO WILL NEED TO CHANGE TO ANGULAR WAY OF HANDLING WINDOW
           window.location.href = `${
@@ -262,8 +265,10 @@ export class AuthorizationService {
   completeAuthorizationRequest(): Promise<TokenResponse> {
     return new Promise((resolve, reject) => {
       this._serviceConfigs
-        .pipe(filter((value: any) => value != null))
-        .pipe(take(1))
+        .pipe(
+          filter((value: any) => value != null),
+          take(1)
+        )
         .subscribe((configuration: AuthorizationServiceConfiguration) => {
           console.log("setting listener");
           this.notifier.setAuthorizationListener((request, response, error) => {
@@ -295,7 +300,7 @@ export class AuthorizationService {
 
               console.log(
                 "making token request:" +
-                  JSON.stringify(tokenRequest.toStringMap())
+                JSON.stringify(tokenRequest.toStringMap())
               );
 
               tokenHandler

@@ -14,6 +14,9 @@ import { RedirectRequestHandler } from "@openid/appauth";
 import { AuthorizationService } from "../authorization.service";
 import { AppRoutingModule } from "../app-routing.module";
 import { Router } from "@angular/router";
+import { Observable } from 'rxjs';
+import { AuthFacade } from '../+state/auth.facade';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: "app-callback",
@@ -21,10 +24,15 @@ import { Router } from "@angular/router";
   styleUrls: ["./callback.component.scss"],
 })
 export class CallbackComponent implements AfterViewInit {
+  isAuthenticated$: Observable<boolean>;
+
   constructor(
     public authorizationService: AuthorizationService,
+    public authFacade: AuthFacade,
     public router: Router
-  ) {}
+  ) {
+    this.isAuthenticated$ = this.authFacade.isAuthenticated$;
+  }
 
   ngAfterViewInit() {
     if (!window.location.hash || window.location.hash.length === 0) {
@@ -35,12 +43,16 @@ export class CallbackComponent implements AfterViewInit {
     } else if (
       new URLSearchParams(window.location.hash.substring(1)).has("code")
     ) {
-      this.authorizationService
-        .completeAuthorizationRequest()
-        .then((tokenResponse) => {
-          console.log("recieved token response: " + tokenResponse);
-          this.router.navigate(["dashboard"]);
-        });
+      this.isAuthenticated$.pipe((take(1))).subscribe((isAuthenticated) => {
+        console.log("I'M AUTHENTICATED INSIDE CALLBACK COMPONENT")
+        this.router.navigate(["dashboard"])
+      })
+      // this.authorizationService
+      //   .completeAuthorizationRequest()
+      //   .then((tokenResponse) => {
+      //     console.log("recieved token response: " + tokenResponse);
+      //     this.router.navigate(["dashboard"]);
+      //   });
     } else {
       console.log("did not recognize callback in URL fragment or query");
       this.router.navigate(["dashboard"]);

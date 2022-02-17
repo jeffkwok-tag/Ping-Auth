@@ -28,8 +28,8 @@ export class MetadataComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.authorizationService.serviceConfiguration().subscribe( (config: AuthorizationServiceConfiguration| null) => {
-            this.authorizationServiceConfiguration = config;
-        });
+        // this.authorizationService.serviceConfiguration().subscribe( (config: AuthorizationServiceConfiguration| null) => {
+        //     this.authorizationServiceConfiguration = config;
+        // });
     }
 }

@@ -10,9 +10,13 @@
 // limitations under the License.
 
 import { Component, OnInit } from "@angular/core";
-import { AuthorizationService } from "../authorization.service";
 import { UserInfo } from "../userinfo";
-import { TokenResponse } from "@openid/appauth";
+// import { TokenResponse } from "@openid/appauth";
+import { AuthFacade } from "../+state/auth.facade";
+import { Observable } from 'rxjs';
+import { AuthUser } from '../models/auth.user';
+
+// import { AuthorizationService } from '../authorization.service';
 
 @Component({
   selector: "app-authentication",
@@ -23,23 +27,32 @@ export class AuthenticationComponent implements OnInit {
   public userInfo: UserInfo | null;
   public authorized: boolean;
 
-  constructor(public authorizationService: AuthorizationService) {
+  isAuthenticated$: Observable<boolean>;
+  userInfo$: Observable<AuthUser | null>;
+
+  constructor(
+    // public authorizationService: AuthorizationService,
+    public authFacade: AuthFacade
+  ) {
     this.userInfo = null;
     this.authorized = false;
+    this.isAuthenticated$ = this.authFacade.isAuthenticated$;
+    this.userInfo$ = this.authFacade.user$;
+    // this.authFacade.init();
   }
 
   ngOnInit() {
-    this.authorizationService
-      .userInfos()
-      .subscribe((userInfo: UserInfo | null) => {
-        console.log(userInfo);
-        this.userInfo = userInfo;
-      });
-    this.authorizationService
-      .tokenResponse()
-      .subscribe((tokenResponse: TokenResponse | null) => {
-        console.log(tokenResponse);
-        this.authorized = tokenResponse != null;
-      });
+    // this.authorizationService
+    //   .userInfos()
+    //   .subscribe((userInfo: UserInfo | null) => {
+    //     console.log(userInfo);
+    //     this.userInfo = userInfo;
+    //   });
+    // this.authorizationService
+    //   .tokenResponse()
+    //   .subscribe((tokenResponse: TokenResponse | null) => {
+    //     console.log(tokenResponse);
+    //     this.authorized = tokenResponse != null;
+    //   });
   }
 }

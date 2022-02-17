@@ -8,24 +8,35 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import { NgModule           } from '@angular/core';
-import { RouterModule       } from '@angular/router';
-import { MetadataComponent  } from './metadata/metadata.component';
-import { CallbackComponent  } from './callback/callback.component';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { MetadataComponent } from './metadata/metadata.component';
+import { CallbackComponent } from './callback/callback.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthResolver } from './auth.resolver';
 
 @NgModule({
-    imports: [
-        RouterModule.forRoot([
-            { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-            { path: 'metadata', component: MetadataComponent },
-            { path: 'callback', component: CallbackComponent },
-            { path: 'dashboard', component: DashboardComponent }
-        ], { relativeLinkResolution: 'legacy' })
-    ],
-    exports: [
-        RouterModule
-    ]
+  imports: [
+    RouterModule.forRoot([
+      {
+        path: '',
+        redirectTo: '/dashboard',
+        pathMatch: 'full'
+      },
+      {path: 'metadata', component: MetadataComponent},
+      {path: 'callback', component: CallbackComponent},
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+        resolve: {
+          main: AuthResolver
+        }
+      }
+    ], {relativeLinkResolution: 'legacy'})
+  ],
+  exports: [
+    RouterModule
+  ]
 })
 
 export class AppRoutingModule {
