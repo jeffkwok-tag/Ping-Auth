@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from "@ngneat/until-destroy";
 import { AuthUser } from "./models/auth.user";
 import { AuthFacade } from "./+state/auth.facade";
-import { AuthorizationConfig } from './authorization_config';
 import { JwksValidationHandler } from 'angular-oauth2-oidc-jwks';
 
 @UntilDestroy()
@@ -22,8 +21,6 @@ export class AuthService {
     showDebugInformation: true,
     timeoutFactor: 0.5,
     dummyClientSecret: 'NKDtdUQ.e0PPwE1q78RWxmQXRE5xGylQpoOqT-ZmLepwX_L.Y7V~4XHG33uklr8f',
-    code: "18b2299e-4ec4-4787-b20e-420c4326799c",
-    code_verifier: "otGn9ni3QHtPKx2HVkccLNrJCCTqiPBQLKORZCumg9qDBWXcG39chYdBnmLH0gAxADnCDqQdPhmD0XFJ5o8GsfLIs7hG6LSjIEDzAKsH9cvFU2CCtZuhTEgb4XVoXqgm"
   };
 
   constructor(
@@ -31,7 +28,6 @@ export class AuthService {
     private router: Router,
     private route: ActivatedRoute,
     private oauthService: OAuthService,
-    @Inject("AuthorizationConfig") private environment: AuthorizationConfig
   ) {
     this.configure();
   }
